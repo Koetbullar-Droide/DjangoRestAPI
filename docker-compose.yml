@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: your_database_name
+      POSTGRES_USER: your_database_user
+      POSTGRES_PASSWORD: your_database_password
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DEBUG: '1'
+      DB_NAME: your_database_name
+      DB_USER: your_database_user
+      DB_PASSWORD: your_database_password
+      DB_HOST: db
+      DB_PORT: '5432'
+
+volumes:
+  postgres_data:
